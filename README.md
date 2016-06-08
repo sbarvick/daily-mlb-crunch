@@ -15,15 +15,15 @@ This is not yet (if ever) to be in PyPi so you will need to pip install the foll
 * pandas
 * requests
 * mlbgame
-* csv
-* tempfile
 * datetime
 
 
 # Quick Start
 
 It is pretty raw, for personal and non-commercial use, so the current steps are:
-1. run setup.py
-2. modify the requests.get call in player_data.py to use your own credentials where it has user=XXX&key=XXX
-3. python daily-crunch.py
+
+1. Do pip install for the modules listed above
+2. Update your mlbgame data with mlbgame-update
+3. modify the requests.get call in player_data.py to use your own credentials where it has user=XXX&key=XXX
+4. python daily-crunch.py
 
