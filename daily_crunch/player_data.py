@@ -18,9 +18,11 @@ class PlayerData(object):
         See: http://panz.io/mlbgame/ for more info
     '''
 
-    # these don't change very often...
+    # Main configuration parameters - these don't change very often...
     YEAR = 2016
     STATS_SCOPE = 5   # number of days back to look at the stats
+    USER = 'XXXX'
+    KEY = 'XXXX'
 
     # dicts for pitcher and batter objects indexed by mlb id
     _pitcher_stats = {}
@@ -62,7 +64,7 @@ class PlayerData(object):
 
         # get the month and day from the yday number
         date = datetime(self.YEAR, 1, 1) + timedelta(yday - 1)
-        print("Adding stats for {} {}".format(date.month, date.day))
+        print("Adding stats for {} {}".format(date.strftime("%B"), date.day))
 
         # walk through all games for this day
         for gamenumber in range(0, 16):
@@ -100,10 +102,10 @@ class PlayerData(object):
         '''
         Process the daily stats from dailybaseballdata.com (requires a subscription
         '''
-        # request the daily data 
-        # Add your own user and key from your subscription or none of this is at all useful
+        # request the daily data
         r = requests.get(
-            'http://dailybaseballdata.com/cgi-bin/dailyhit.pl?date=&xyear=2015&pa=1&showdfs=&sort=ops&r40=0&scsv=2&user=XXX&key=XXX&nohead=1')
+            'http://dailybaseballdata.com/cgi-bin/dailyhit.pl?date=&xyear=2015&pa=1&showdfs=&sort=ops&r40=0&scsv=2&user={}&key={}&nohead=1'.
+        format(self.USER, self.KEY))
 
         # write the data to a temporary file to more easily use the csv library
         self.today_file = tempfile.NamedTemporaryFile(delete=False)

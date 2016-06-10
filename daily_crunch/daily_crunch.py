@@ -27,7 +27,6 @@ if __name__ == "__main__":
                 era = pitcher.summary_stats['era']
                 if matchup['Bats'] != matchup['Throws']:
                     todays_list[batter_id] = s_avg + era
-                    print('adding ')
             except Exception as e:
                 print("Exception calculating matchup: " + e.message)
 
