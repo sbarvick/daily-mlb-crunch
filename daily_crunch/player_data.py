@@ -37,6 +37,12 @@ class PlayerData(object):
         Initialize with the desired stats date and assume the desired output based on the stats date
         :param datetime date: The desired stats processing date
         '''
+
+        # Sanity check the authentication data
+        if self.USER == 'XXXX' or self.KEY == 'XXXX':
+            print("Please update USER and KEY for DailyBaseballData with proper credentials")
+            exit()
+
         self._date = date
 
         # process the stats for the current year from the beginning of the season through the date
@@ -103,9 +109,12 @@ class PlayerData(object):
         Process the daily stats from dailybaseballdata.com (requires a subscription
         '''
         # request the daily data
-        r = requests.get(
-            'http://dailybaseballdata.com/cgi-bin/dailyhit.pl?date=&xyear=2015&pa=1&showdfs=&sort=ops&r40=0&scsv=2&user={}&key={}&nohead=1'.
-        format(self.USER, self.KEY))
+        try:
+            r = requests.get(
+                'http://dailybaseballdata.com/cgi-bin/dailyhit.pl?date=&xyear=2015&pa=1&showdfs=&sort=ops&r40=0&scsv=2&user={}&key={}&nohead=1'.
+                format(self.USER, self.KEY))
+        except Exception as e:
+            print('Exception encountered getting daily data: ' + e.message)
 
         # write the data to a temporary file to more easily use the csv library
         self.today_file = tempfile.NamedTemporaryFile(delete=False)

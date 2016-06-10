@@ -31,7 +31,9 @@ if __name__ == "__main__":
                 print("Exception calculating matchup: " + e.message)
 
     # now sort and spit out the top picks
-    for choice in sorted(todays_list, key = todays_list.get, reverse=True):
+    print("Today's top recommendations are: ")
+    top10 = [x for x in range(1, 10) in sorted(todays_list, key = todays_list.get, reverse=True)]
+    for choice in top10:
         batter = pd.get_player(choice)
         print('{} with {} avg at {} combined score'.format(batter.name, batter.summary_stats['avg'], todays_list[choice]))
 
