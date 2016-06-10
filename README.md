@@ -24,6 +24,6 @@ It is pretty raw, for personal and non-commercial use, so the current steps are:
 
 1. Do pip install for the modules listed above
 2. Update your mlbgame data with mlbgame-update
-3. modify the requests.get call in player_data.py to use your own credentials where it has user=XXX&key=XXX
+3. modify the requests.get call in player_data.py to use your own credentials with USER= and KEY=
 4. python daily-crunch.py
 
