@@ -2,27 +2,23 @@ from __future__ import print_function
 from batter import Batter
 from pitcher import Pitcher
 import mlbgame
+from csv import DictReader
 from datetime import datetime
 from datetime import timedelta
-from dateutil import parser
-import requests
-import tempfile
-from csv import DictReader
+import os
 
 
 class PlayerData(object):
     ''' Pitcher and Batter data collected and stored from the various sources so that it can
         be accessed from data mining or model exercising code
 
-        This code depends upon mlbgame data and remember to run mlbgame-update to get the latest
+        This code depends upon running daily_download.py to get the daily data
         See: http://panz.io/mlbgame/ for more info
     '''
 
     # Main configuration parameters - these don't change very often...
     YEAR = 2016
     STATS_SCOPE = 5   # number of days back to look at the stats
-    USER = 'XXXX'
-    KEY = 'XXXX'
 
     # dicts for pitcher and batter objects indexed by mlb id
     _pitcher_stats = {}
@@ -32,18 +28,21 @@ class PlayerData(object):
     today_file = ""
     today_data = []
 
-    def __init__(self, date):
+    def __init__(self, date, data_dir):
         '''
         Initialize with the desired stats date and assume the desired output based on the stats date
         :param datetime date: The desired stats processing date
         '''
 
-        # Sanity check the authentication data
-        if self.USER == 'XXXX' or self.KEY == 'XXXX':
-            print("Please update USER and KEY for DailyBaseballData with proper credentials")
-            exit()
-
         self._date = date
+        self._data_dir = data_dir
+
+        # process the daily stats for today
+        # (if the stats don't exist, the Exception will come all the way out)
+        try:
+            self._process_dailybaseballdata_stats()
+        except Exception as e:
+            raise
 
         # process the stats for the current year from the beginning of the season through the date
         # if stats don't exist, either because it is before the season starts or haven't been loaded
@@ -51,9 +50,6 @@ class PlayerData(object):
         today_yday = self._date.timetuple().tm_yday
         for yday in range(today_yday - self.STATS_SCOPE, today_yday):
             self._process_mlb_day_stats(yday)
-
-        # process the daily stats for today
-        self._process_dailybaseballdata_stats()
 
         # run the summarization
         for id, pitcher in self._pitcher_stats.items():
@@ -106,42 +102,30 @@ class PlayerData(object):
 
     def _process_dailybaseballdata_stats(self):
         '''
-        Process the daily stats from dailybaseballdata.com (requires a subscription
+        Process the daily stats from dailybaseballdata.com as previously downloaded by daily_download.py
+        and stored in self._data_dir/MMDDYYYY.txt
         '''
-        # request the daily data
+
+        # define the data file that is expected to exist already
+        self.today_file = os.path.join(self._data_dir,'{:02d}{:02d}{:4d}.txt'.format(self._date.month, self._date.day, self._date.year))
+
+        # now read it back as a processed csv and make into dictionary
         try:
-            r = requests.get(
-                'http://dailybaseballdata.com/cgi-bin/dailyhit.pl?date=&xyear=2015&pa=1&showdfs=&sort=ops&r40=0&scsv=2&user={}&key={}&nohead=1'.
-                format(self.USER, self.KEY))
-        except Exception as e:
-            print('Exception encountered getting daily data: ' + e.message)
+            with open(self.today_file, 'r'):
+                today_dict = DictReader(open(self.today_file))
+                for line in today_dict:
+                    # add this to a basic list for public use
+                    self.today_data.append(line)
 
-        # write the data to a temporary file to more easily use the csv library
-        self.today_file = tempfile.NamedTemporaryFile(delete=False)
-        #print("writing to " + self.today_file.name)
-        try:
-            # write only the data starting with the second line
-            self.today_file.write(r.text[r.text.find('MLB'):])
-            self.today_file.close()
-
-            # now read it back as a processed csv and make into dictionary
-            today_dict = DictReader(open(self.today_file.name))
-            for line in today_dict:
-                # add this to a basic list for public use
-                self.today_data.append(line)
-
-                # add other interesting information to the player objects that we have (if we have one for the player)
-                mlb_id = int(line['MLB_ID'])
-                if mlb_id in self._batter_stats:
-                    self._batter_stats[mlb_id].handed = line['Bats']
-                if mlb_id in self._pitcher_stats:
-                    self._pitcher_stats[mlb_id].handed = line['Throws']
-                # if we start to pull out more interesting information, might need to pull this into a function
-
-        except Exception as e:
-            print("Exception: " + e.message)
-        finally:
-            pass
+                    # add other interesting information to the player objects that we have (if we have one for the player)
+                    mlb_id = int(line['MLB_ID'])
+                    if mlb_id in self._batter_stats:
+                        self._batter_stats[mlb_id].handed = line['Bats']
+                    if mlb_id in self._pitcher_stats:
+                        self._pitcher_stats[mlb_id].handed = line['Throws']
+                    # if we start to pull out more interesting information, might need to pull this into a function
+        except:
+            raise Exception('No stats available for {}'.format(self._date))
 
     def get_player(self, mlb_id):
         '''
