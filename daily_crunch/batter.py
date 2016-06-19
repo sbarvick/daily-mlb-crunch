@@ -13,6 +13,9 @@ class Batter(Player):
         """
         super(Batter,self).__init__(name, name_display, id)
 
+        # cache the number of hits the last time the stats were calculated
+        hits_today = 0
+
         # initialize the containers for all the stats we will be keeping
         self._columns = ['row','s_rbi','s_r','s_so','s_h','s_bb','so','h','ao','hbp','bb','slg','obp','ops','avg']
 
