@@ -23,8 +23,13 @@ This is not yet (if ever) to be in PyPi so you will need to pip install the foll
 It is pretty raw, for personal and non-commercial use, so the current steps are:
 
 1. Do pip install for the modules listed above
-2. Usually daily, before the games start, run python daily_download.py -u <username> -k <key> -d <full path to data directory>
-3. To get sampple recommendations, run python daily-crunch.py -d <full path to data directory>
+2. Usually daily, before the games start, run 
+
+    python daily_download.py -u <username> -k <key> -d <full path to data directory>
+
+3. To get sampple recommendations, run 
+
+    python daily-crunch.py -d <full path to data directory>
 
 # More Advanced
 
