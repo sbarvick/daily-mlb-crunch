@@ -29,7 +29,7 @@ It is pretty raw, for personal and non-commercial use, so the current steps are:
     python daily_download.py -u <username> -k <key> -d <full path to data directory>
 ```
 
-3. To get sampple recommendations, run 
+3. To get sample recommendations, run 
 
 ```
     python daily-crunch.py -d <full path to data directory>
