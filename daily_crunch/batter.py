@@ -20,5 +20,15 @@ class Batter(Player):
         self._columns = ['row','s_rbi','s_r','s_so','s_h','s_bb','so','h','ao','hbp','bb','slg','obp','ops','avg']
 
 
-def __repr__(self):
-    return 'Batter(%s)' % self.name_display
+    def __repr__(self):
+        return 'Batter(%s)' % self.name_display
+
+
+    def get_hits(self, index):
+        '''
+        Returns the hits for this batter for the index to be used for testing algorithms
+        This could be made easier, but for now the last entry (yesterday) is -1, etc
+        :param index: the requested date index (from the start day) of the hits
+        :return: The number of hits for the batter
+        '''
+        return self._df["h"].iloc[index]

@@ -28,14 +28,13 @@ class Algorithm(object):
         self.results = {}
 
         # get the stats for this date
-        yday = self.date.timetuple().tm_yday
         try:
-            self.player_data = PlayerData(datetime(self.date.year, 1, 1) + timedelta(yday - 1), data_dir)
+            self.player_data = PlayerData(self.date, self.data_dir)
         except Exception as e:
             raise
 
     def __repr__(self):
-        return 'Algorithm for {} with data from {} '.format(self.date, self.data_dir)
+        return 'Base class algorithm for {} with data from {} '.format(self.date, self.data_dir)
 
     def get_top_picks(self, number):
         '''

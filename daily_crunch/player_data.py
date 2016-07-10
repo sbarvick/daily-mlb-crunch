@@ -20,14 +20,6 @@ class PlayerData(object):
     YEAR = 2016
     STATS_SCOPE = 5   # number of days back to look at the stats
 
-    # dicts for pitcher and batter objects indexed by mlb id
-    _pitcher_stats = {}
-    _batter_stats = {}
-
-    # file and list of dictionary stats collected for today
-    today_file = ""
-    today_data = []
-
     def __init__(self, date, data_dir):
         '''
         Initialize with the desired stats date and assume the desired output based on the stats date
@@ -37,19 +29,28 @@ class PlayerData(object):
         self._date = date
         self._data_dir = data_dir
 
+        # dicts for pitcher and batter objects indexed by mlb id
+        self._pitcher_stats = {}
+        self._batter_stats = {}
+
+        # file and list of dictionary stats collected for today
+        self.today_file = ""
+        self.today_data = []
+
+        # process the stats for desired timeframe
+        # this data is largely about each batter and pitcher's stats from the day
+        # if stats don't exist, an Exception will be thrown
+        today_yday = self._date.timetuple().tm_yday
+        for yday in range(today_yday - self.STATS_SCOPE, today_yday):
+            self._process_mlb_day_stats(yday)
+
         # process the daily stats for today
-        # (if the stats don't exist, the Exception will come all the way out)
+        # this data is largely about the pitching matchups
+        # if the stats don't exist, raise an Exception that comes all the way out
         try:
             self._process_dailybaseballdata_stats()
         except Exception as e:
             raise
-
-        # process the stats for the current year from the beginning of the season through the date
-        # if stats don't exist, either because it is before the season starts or haven't been loaded
-        # year, catch the Exception and move on
-        today_yday = self._date.timetuple().tm_yday
-        for yday in range(today_yday - self.STATS_SCOPE, today_yday):
-            self._process_mlb_day_stats(yday)
 
         # run the summarization
         for id, pitcher in self._pitcher_stats.items():
@@ -66,7 +67,7 @@ class PlayerData(object):
 
         # get the month and day from the yday number
         date = datetime(self.YEAR, 1, 1) + timedelta(yday - 1)
-        print("Adding stats for {} {}".format(date.strftime("%B"), date.day))
+        #print("Adding stats for {} {}".format(date.strftime("%B"), date.day))
 
         # walk through all games for this day
         for gamenumber in range(0, 16):
