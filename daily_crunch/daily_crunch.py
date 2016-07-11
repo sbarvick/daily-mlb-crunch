@@ -86,11 +86,11 @@ if __name__ == "__main__":
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'hd:o:', ['directory=', 'ordinal-date='])
     except getopt.GetoptError:
-        print('daily_crunch.py -d <data directory> -o <oridinal date>')
+        print('daily_crunch.py -d <data directory> -o <ordinal date>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('daily_crunch.py -d <data directory> -o <oridinal date>')
+            print('daily_crunch.py -d <data directory> -o <ordinal date>')
             sys.exit()
         elif opt in ('-d', '--directory'):
             data_dir = arg
